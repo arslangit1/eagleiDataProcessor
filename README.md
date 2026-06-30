@@ -104,7 +104,7 @@ However, the config file provides a lot more options to change.
 ## How to use - For multi-county analysis
 As mentioned in the overview, the repo also offers the capabilities to combine data from individual counties together to form a larger dataset for multiple counties and even multiple states. Following is the step-by-step process to combine data for multiple-counties:
 1. Run the full pipeline for each county (as explained above) to generate the merged outage and weather data files for each county.
-2. Edit `config.json` file and mention the county names alongwith the corresponding state names for which you want to combine the data:
+2. Edit `config.json` file and mention the county names alongwith the corresponding state names for which you want to combine the data. Also add an optional (but recommended) "label" parameter to identify the result files:
     ```json
     {
       "multi_county_analysis_parameters": {
@@ -113,7 +113,8 @@ As mentioned in the overview, the repo also offers the capabilities to combine d
           {"state": "Illinois", "county": "Jersey"},
           {"state": "Illinois", "county": "Richland"},
           {"state": "Illinois", "county": "Whiteside"}
-        ]
+        ],
+        "label": "Illinois_4_counties"
       }
     }
     ``` 
