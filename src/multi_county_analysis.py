@@ -6,8 +6,7 @@ import networkx as nx
 
 from src.configManager import ConfigManager
 from src.eaglei_modules import constants
-from src.eaglei_modules.eagleiEventProcessing import apply_spatiotemporal_grouping_optimized, apply_spatiotemporal_grouping
-# from src.eaglei_modules.eagleiEventProcessing import apply_spatiotemporal_grouping_optimized2
+from src.eaglei_modules.eagleiEventProcessing import apply_spatiotemporal_grouping_optimized
 
 def create_multi_county_events(state_county_pairs: list[dict], 
                                start_year: int, 
@@ -346,8 +345,7 @@ def _apply_temporal_event_grouping(dataset: xr.Dataset, new_event_column_name: s
 def _apply_spatiotemporal_event_grouping(dataset: xr.Dataset, 
                                          county_adjacency_graph: nx.Graph,
                                          county_event_col_name: str = 'event_number_eaglei',
-                                         temporal_event_col_name: str = 'event_number_mc_temporal', 
-                                         new_event_column_name: str = 'event_number_mc_spatiotemporal') -> xr.Dataset:
+                                         temporal_event_col_name: str = 'event_number_mc_temporal') -> xr.Dataset:
     '''
     Apply spatiotemporal event grouping within each temporal event to identify events that are both temporally overlapping and spatially adjacent.
     Parameters:
@@ -360,23 +358,11 @@ def _apply_spatiotemporal_event_grouping(dataset: xr.Dataset,
         Name of the variable containing county-level event numbers.
     temporal_event_col_name : str
         Name of the variable containing temporal event numbers.
-    new_event_column_name : str
-        Name of the new variable to store spatiotemporal event grouping results.
     Returns:
     --------
     xr.Dataset
         Updated xarray dataset with spatiotemporal event grouping results.
     '''
-
-    # dataset, df_result = apply_spatiotemporal_grouping(
-    #     combined=dataset,
-    #     graph_of_counties=county_adjacency_graph,
-    #     temporal_event_col=temporal_event_col_name,
-    #     county_event_col=county_event_col_name,
-    #     neighbour_level=1,
-    #     time_overlap_method='outage_process_overlap',
-    #     verbose=1
-    # )
 
     dataset, df_result = apply_spatiotemporal_grouping_optimized(
         combined=dataset,
@@ -387,15 +373,5 @@ def _apply_spatiotemporal_event_grouping(dataset: xr.Dataset,
         time_overlap_method='outage_process_overlap',
         verbose=1
     )
-
-    # dataset, df_result = apply_spatiotemporal_grouping_optimized2(
-    #     combined=dataset,
-    #     graph_of_counties=county_adjacency_graph,
-    #     temporal_event_col=temporal_event_col_name,
-    #     county_event_col=county_event_col_name,
-    #     neighbour_level=1,
-    #     time_overlap_method='outage_process_overlap',
-    #     verbose=1
-    # )
 
     return dataset

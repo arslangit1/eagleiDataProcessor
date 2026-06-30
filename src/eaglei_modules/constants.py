@@ -2,7 +2,7 @@
 # This file contains pre-defined constants used across the EAGLEi Outage Analysis module.
 
 
-# Path to the EAGLEi data directory
+# Path to the data directories
 import os
 EAGLEI_DATA_DIR = os.path.join('eagle-idatasets')
 PROCESSED_DATA_DIR = os.path.join('processed_data')
