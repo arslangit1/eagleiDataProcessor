@@ -90,9 +90,11 @@ def calculate_event_stats_single_county(state: str, county: str, start: int, end
     weather_stats_df = pd.DataFrame(weather_stats_list)
     events_stats = pd.merge(events_stats, weather_stats_df, on='event_number', how='left')
     event_file_dir = os.path.join(config.get("data_paths.event_data_dir"), "county_events", state)
+    # check if directory exists, if not create it
+    os.makedirs(event_file_dir, exist_ok=True)
     event_file_name = config.get("file_patterns.event_stats_file_pattern").format(start=start, end=end, county=county)
     event_file_path = os.path.join(event_file_dir, event_file_name)
-    events_stats.to_parquet(event_file_path)
+    events_stats.to_csv(event_file_path, index=False)
 
 def list_to_csv(value):
     if isinstance(value, list):
@@ -159,11 +161,13 @@ def initialize_multi_county_calc(start: int, end: int, config: ConfigManager) ->
 
     event_stats=pd.concat([event_stats_eaglei,event_stats_multi_county])
     event_file_dir = os.path.join(config.get("data_paths.event_data_dir"), "spatiotemporal_events")
+    # check if directory exists, if not create it
+    os.makedirs(event_file_dir, exist_ok=True)
     event_file_name = config.get("file_patterns.event_stats_file_pattern").format(start=start, end=end,
                                                                                        county=config.get(
                                                                                            "multi_county_analysis_parameters.label"))
     os.makedirs(event_file_dir, exist_ok=True)
     event_file_path = os.path.join(event_file_dir, event_file_name)
-    event_stats.to_parquet(event_file_path)
+    event_stats.to_csv(event_file_path, index=False)
 
 

@@ -48,7 +48,7 @@
     "cleaned_outage_file_pattern": "cleaned_outage_{state}_{county}_{start}_{end}.parquet",
     "merged_file_pattern": "merged_data_{state}_{county}_{start}_{end}.nc",
     "merged_result_file_pattern": "Outage_Events_Summary_All_{county}_{threshold}_{start}-{end}.csv",
-    "event_stats_file_pattern": "{county}_event_stats_{start}_{end}.parquet",
+    "event_stats_file_pattern": "{county}_event_stats_{start}_{end}.csv",
     "multi_county_data_file_pattern": "multi_county_data_{start}_{end}_{label}_counties.nc"
   },
   "visualization_settings": {
