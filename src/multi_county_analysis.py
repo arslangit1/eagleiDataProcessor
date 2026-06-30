@@ -156,8 +156,7 @@ def create_multi_county_events(state_county_pairs: list[dict],
             ds_combined,
             county_adjacency_graph=adjacency_graph,
             county_event_col_name='event_number_eaglei',
-            temporal_event_col_name='event_number_mc_temporal',
-            new_event_column_name='event_number_mc_spatiotemporal'
+            temporal_event_col_name='event_number_mc_temporal'
         )
         
         # Remove existing attributes if present
