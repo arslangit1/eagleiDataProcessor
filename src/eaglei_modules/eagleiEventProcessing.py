@@ -1243,11 +1243,11 @@ def get_eaglei_event_stats(eaglei_df: pd.DataFrame,
         # apply the function to all event numbers and create a DataFrame
         event_stats = []
         event_numbers=np.sort(event_numbers)
-        for event_number in event_numbers:
+        for i, event_number in enumerate(event_numbers):
             stats = _get_eaglei_event_stats_single_event(eaglei_df, event_number, event_method, timestamp_column,
                                                          customer_column, counties, spatiotemporal)
-            if event_number % 100 == 0:
-                print(f"  Processing {event_method} event {event_number}/{len(event_numbers)}")
+            if i % 100 == 0:
+                print(f"  Processing {event_method} event {i}/{len(event_numbers)}")
             # only add the stats if start_time is not None (i.e., event exists)
             if stats['start_time'] is not None:
                 event_stats.append(stats)
