@@ -156,6 +156,7 @@ def create_netcdf_weather_stations(state, county, start_year, end_year, raw_data
             # Replace M wind gust values with 0
             if var=='gust':
                 mask = weather_data[var] == 'M'
+                weather_data[var] = pd.to_numeric(weather_data[var], errors="coerce")
                 weather_data.loc[mask, var] = 0
 
             station_data = weather_data[weather_data['station'] == station][['valid', var]].copy()

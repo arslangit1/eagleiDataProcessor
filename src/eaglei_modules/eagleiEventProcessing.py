@@ -890,7 +890,7 @@ def extract_events_eaglei_ac_threshold(outage_df: pd.DataFrame,
               f'as those greater than {customer_threshold} customers.')
     elif event_detection_type=='percent_customers':
         if total_customers != 0:
-            customer_threshold=round(customer_threshold*int(total_customers))
+            customer_threshold=round(customer_threshold*int(total_customers.item()))
             print(f'Defining events as a percent of customers in the county out: Events defined '
                   f'as those greater than {customer_threshold} customers.')
         else:
