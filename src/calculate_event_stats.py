@@ -6,22 +6,29 @@ from src.eaglei_modules.eagleiEventProcessing import get_eaglei_event_stats
 from src.configManager import ConfigManager
 
 def match_event_with_weather_stats(weather_df, counties_affected, start_time, end_time, event_num):
-
-    # fast datetime index slice
+    # Fast datetime index slice
     selected = weather_df.loc[start_time:end_time]
 
-    # county filter
+    # County filter
     if isinstance(counties_affected, list):
         selected = selected[selected['county'].isin(counties_affected)]
     elif isinstance(counties_affected, str):
         selected = selected[selected['county'] == counties_affected]
 
+    # Calculate statistics across all stations
     stats = selected.agg({
         'sknt': ['max', 'min', 'mean'],
         'gust': ['max', 'min', 'mean'],
         'tmpf': ['max', 'min', 'mean'],
-        'p01i': ['sum', 'max', 'mean']
     })
+
+    # Average precipitation across stations at each timestamp,
+    # then calculate event-level statistics
+    precip_by_time = selected['p01i'].groupby('time').mean()
+
+    total_p01i = precip_by_time.sum()
+    max_p01i = selected['p01i'].max()
+    avg_p01i = selected['p01i'].mean()
 
     return {
         'event_number': event_num,
@@ -38,10 +45,9 @@ def match_event_with_weather_stats(weather_df, counties_affected, start_time, en
         'min_tmpf': stats.loc['min', 'tmpf'],
         'avg_tmpf': stats.loc['mean', 'tmpf'],
 
-        'total_p01i': stats.loc['sum', 'p01i'],
-        'max_p01i': stats.loc['max', 'p01i'],
-        'avg_p01i': stats.loc['mean', 'p01i'],
-
+        'total_p01i': total_p01i,
+        'max_p01i': max_p01i,
+        'avg_p01i': avg_p01i,
     }
 
 def calculate_event_stats_single_county(state: str, county: str, start: int, end: int, config: ConfigManager) -> None:

@@ -176,9 +176,47 @@ def create_netcdf_weather_stations(state, county, start_year, end_year, raw_data
             station_full = pd.DataFrame({'valid': full_time_range})
             station_full = station_full.merge(station_data, on='valid', how='left')
             # Interpolate missing values
-            station_full[var] = station_full[var].interpolate(method='nearest')
-            station_full[var] = station_full[var].ffill()
+            if var == 'tmpf':
+                station_full[var] = station_full[var].interpolate(method='nearest')
+            elif var=='p01i':
+                original = station_full[var].copy()
+
+                # Preserve independently observed 15-minute values
+                mask_15min = (
+                        original.notna() &
+                        (station_full['valid'].dt.minute != 0)
+                )
+
+                # Extract hourly precipitation observations
+                hourly_values = (
+                    station_full.loc[
+                        station_full['valid'].dt.minute == 0,
+                        ['valid', var]
+                    ]
+                    .dropna(subset=[var])
+                    .set_index('valid')[var]
+                )
+
+                # Assign hourly accumulation to the preceding four 15-minute intervals,
+                # excluding the hourly timestamp itself
+                previous_hour = station_full['valid'].dt.floor('h')
+
+                is_hourly = station_full['valid'].dt.minute == 0
+
+                target_hour = previous_hour + pd.Timedelta(hours=1)
+
+                # At exact hourly timestamps, use that timestamp's own observation
+                target_hour.loc[is_hourly] = station_full.loc[is_hourly, 'valid']
+
+                # Distribute hourly precipitation
+                station_full[var] = target_hour.map(hourly_values) / 4
+
+                # Restore independently observed 15-minute values
+                station_full.loc[mask_15min, var] = original.loc[mask_15min]
+
+            # frontfill and backfill remainders
             station_full[var] = station_full[var].bfill()
+            station_full[var] = station_full[var].ffill()
             # Fill the array
             var_array[:, i] = station_full[var].values
         
@@ -219,7 +257,7 @@ def create_netcdf_weather_stations(state, county, start_year, end_year, raw_data
     if 'gust' in ds.data_vars:
         ds['gust'].attrs = {'long_name': 'Wind Gust', 'units': 'knots'}
     if 'p01i' in ds.data_vars:
-        ds['p01i'].attrs = {'long_name': 'Precipitation (1-hour)', 'units': 'inches'}
+        ds['p01i'].attrs = {'long_name': 'Precipitation', 'units': 'inches'}
     if 'poccurence' in ds.data_vars:
         ds['poccurence'].attrs = {'long_name': 'Precipitation Occurrence', 'units': 'boolean (0/1)'}
     
